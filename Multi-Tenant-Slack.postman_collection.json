@@ -1,0 +1,107 @@
+{
+  "info": {
+    "name": "Multi-Tenant Slack — Tenant Isolation Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "tokenA", "value": "" },
+    { "key": "tokenB", "value": "" },
+    { "key": "workspaceA_id", "value": "" },
+    { "key": "workspaceB_id", "value": "" },
+    { "key": "channelA_id", "value": "" },
+    { "key": "channelB_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "01 — Create Workspace A (owner)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+        "url": { "raw": "{{baseUrl}}/workspaces", "host": ["{{baseUrl}}"], "path": ["workspaces"] },
+        "body": { "mode": "raw", "raw": "{\"name\": \"Acme Inc\", \"slug\": \"acme\"}" }
+      }
+    },
+    {
+      "name": "02 — Create Workspace B (owner)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+        "url": { "raw": "{{baseUrl}}/workspaces", "host": ["{{baseUrl}}"], "path": ["workspaces"] },
+        "body": { "mode": "raw", "raw": "{\"name\": \"Beta LLC\", \"slug\": \"beta\"}" }
+      }
+    },
+    {
+      "name": "03 — Create channel in Workspace A",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+        "url": { "raw": "{{baseUrl}}/channels", "host": ["{{baseUrl}}"], "path": ["channels"] },
+        "body": { "mode": "raw", "raw": "{\"name\": \"general-acme\"}" }
+      }
+    },
+    {
+      "name": "04 — Create channel in Workspace B",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+        "url": { "raw": "{{baseUrl}}/channels", "host": ["{{baseUrl}}"], "path": ["channels"] },
+        "body": { "mode": "raw", "raw": "{\"name\": \"general-beta\"}" }
+      }
+    },
+    {
+      "name": "05 — Invite member to Workspace A",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+        "url": { "raw": "{{baseUrl}}/workspaces/{{workspaceA_id}}/invites", "host": ["{{baseUrl}}"], "path": ["workspaces", "{{workspaceA_id}}", "invites"] },
+        "body": { "mode": "raw", "raw": "{\"email\": \"teammate@acme.com\", \"role\": \"member\"}" }
+      }
+    },
+    {
+      "name": "06 — Accept invite (new user token)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{tokenB}}" }],
+        "url": { "raw": "{{baseUrl}}/invites/:token/accept", "host": ["{{baseUrl}}"], "path": ["invites", ":token", "accept"], "variable": [{ "key": "token", "value": "PASTE_INVITE_TOKEN_HERE" }] }
+      }
+    },
+    {
+      "name": "07 — Cross-workspace leak test (MUST 404)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+        "url": { "raw": "{{baseUrl}}/channels/{{channelB_id}}", "host": ["{{baseUrl}}"], "path": ["channels", "{{channelB_id}}"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 404 (no cross-workspace leak)\", function() {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 — List members in Workspace A",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+        "url": { "raw": "{{baseUrl}}/workspaces/{{workspaceA_id}}/members", "host": ["{{baseUrl}}"], "path": ["workspaces", "{{workspaceA_id}}", "members"] }
+      }
+    },
+    {
+      "name": "09 — Change member role (owner only)",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+        "url": { "raw": "{{baseUrl}}/memberships/:id", "host": ["{{baseUrl}}"], "path": ["memberships", ":id"], "variable": [{ "key": "id", "value": "PASTE_MEMBERSHIP_ID_HERE" }] },
+        "body": { "mode": "raw", "raw": "{\"role\": \"admin\"}" }
+      }
+    }
+  ]
+}
