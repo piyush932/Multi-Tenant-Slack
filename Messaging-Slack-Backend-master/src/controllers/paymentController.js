@@ -1,57 +1,50 @@
-import { StatusCodes } from "http-status-codes";
+import { StatusCodes } from 'http-status-codes';
+import razorpay, { isPaymentConfigured } from '../config/razorpayConfig.js';
+import { CURRENCY } from '../config/serverConfig.js';
 
-import razorpay from '../config/razorpayConfig.js';
-import { CURRENCY, RECEIPT_SECRET } from "../config/serverConfig.js";
-import { createPaymentService, updatePaymentStatusService } from "../services/paymentService.js";
-import { internalErrorResponse } from "../utils/common/responseObjects.js";
-export const createOrderController = async (req, res) => {
-    try {
-        const options = {
-            amount: req.body.amount,
-            currency: CURRENCY,
-            receipt: RECEIPT_SECRET
-        };
+export const createOrder = async (req, res) => {
+  if (!isPaymentConfigured) {
+    return res.status(StatusCodes.NOT_IMPLEMENTED).json({
+      success: false,
+      message: 'Payments are disabled in local/demo mode. Set RAZORPAY_KEY_ID ' +
+                'and RAZORPAY_KEY_SECRET in .env to enable this feature.',
+    });
+  }
 
-        const order = await razorpay.orders.create(options);
+  try {
+    const { amount } = req.body;
+    const options = {
+      amount,
+      currency: CURRENCY,
+      receipt: `receipt_${Date.now()}`,
+    };
+    const order = await razorpay.orders.create(options);
+    console.log(order);
+    return res.status(StatusCodes.CREATED).json({ success: true, data: order });
+  } catch (err) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: err.message });
+  }
+};
 
-        console.log(order);
+export const captureOrder = async (req, res) => {
+  if (!isPaymentConfigured) {
+    return res.status(StatusCodes.NOT_IMPLEMENTED).json({
+      success: false,
+      message: 'Payments are disabled in local/demo mode.',
+    });
+  }
 
-        await createPaymentService(order.id, order.amount)
-
-        if(!order) {
-            throw new Error('Failed to create order');
-        }
-
-        return res.status(StatusCodes.CREATED).json({
-            success: true,
-            message: 'Order created successfully',
-            data: order
-        });
-
-    } catch (error) {
-        console.log('Error in createOrderController', error);
-        return res
-            .status(StatusCodes.INTERNAL_SERVER_ERROR)
-            .json(internalErrorResponse(error));
-            
-    }
-}
-
-export const capturePaymentController = async (req, res) => {
-    try {
-        console.log('Request body', req.body);
-        await updatePaymentStatusService(req.body.orderId, req.body.status, req.body.paymentId, req.body.signature);
-        return res.status(StatusCodes.OK).json({
-            success: true,
-            message: 'Payment captured successfully',
-            data: ''
-        });
-
-    } catch (error) {
-        console.log('Error in capturePaymentController', error);
-        return res
-            .status(StatusCodes.INTERNAL_SERVER_ERROR)
-            .json(internalErrorResponse(error));
-            
-    }
-}
+  try {
+    const { orderId, status, paymentId, signature } = req.body;
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      data: { orderId, status, paymentId, signature },
+    });
+  } catch (err) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: err.message });
+  }
+};
