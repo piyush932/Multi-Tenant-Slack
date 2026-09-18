@@ -1,4 +1,5 @@
 import razorpay from 'razorpay';
+
 import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from './serverConfig.js';
 
 const isConfigured = Boolean(RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET);

@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+
 import { MAIL_ID, MAIL_PASSWORD } from './serverConfig.js';
 
 const isMailConfigured = Boolean(MAIL_ID && MAIL_PASSWORD);

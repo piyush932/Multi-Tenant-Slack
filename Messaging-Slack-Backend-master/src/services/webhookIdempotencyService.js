@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+
 import WebhookEvent from '../schema/webhookEvent.js';
 
 export async function withIdempotency(providerEventId, type, payload, applyEffect) {

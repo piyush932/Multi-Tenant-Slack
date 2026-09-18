@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
-import Channel from '../schema/channel.js';
+
 import { forTenant } from '../repositories/tenantScopedRepository.js';
+import Channel from '../schema/channel.js';
 
 export async function getChannel(req, res) {
   try {

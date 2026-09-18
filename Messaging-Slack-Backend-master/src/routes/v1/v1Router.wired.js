@@ -1,12 +1,13 @@
 import express from 'express';
+
 import channelRoutes from './channel.js';
+import inviteRoutes from './invite.routes.js';
 import membersRoutes from './members.js';
+import membershipRoutes from './membership.routes.js';
 import messagesRoutes from './messages.js';
 import paymentRoutes from './payment.js';
 import usersRoutes from './users.js';
 import workspacesRoutes from './workspaces.js';
-import inviteRoutes from './invite.routes.js';
-import membershipRoutes from './membership.routes.js';
 
 const router = express.Router();
 

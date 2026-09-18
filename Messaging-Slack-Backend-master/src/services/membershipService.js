@@ -1,6 +1,6 @@
 import {
-  findMembership,
   countOwners,
+  findMembership,
   updateRole,
 } from '../repositories/membershipRepository.js';
 

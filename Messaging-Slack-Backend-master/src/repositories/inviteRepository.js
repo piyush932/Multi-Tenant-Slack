@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+
 import Invite from '../schema/invite.js';
 
 const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000;

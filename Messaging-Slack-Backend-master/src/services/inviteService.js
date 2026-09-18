@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Workspace from '../schema/workspace.js';
+
 import {
   createInvite,
   findValidInviteByToken,
@@ -7,6 +7,7 @@ import {
 } from '../repositories/inviteRepository.js';
 import { createOwnerMembership } from '../repositories/membershipRepository.js';
 import Membership from '../schema/membership.js';
+import Workspace from '../schema/workspace.js';
 
 export async function inviteMember(workspaceId, email, role) {
   return createInvite(workspaceId, email, role);

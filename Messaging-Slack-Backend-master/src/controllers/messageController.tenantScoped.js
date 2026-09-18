@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
-import Message from '../schema/message.js';
+
 import { forTenant } from '../repositories/tenantScopedRepository.js';
+import Message from '../schema/message.js';
 
 export async function getMessage(req, res) {
   try {

@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
-import Workspace from '../schema/workspace.js';
+
 import Membership from '../schema/membership.js';
+import Workspace from '../schema/workspace.js';
 
 async function resolveTenantMiddleware(req, res, next) {
   try {

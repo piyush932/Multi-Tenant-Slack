@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
-import { inviteMember, acceptInvite } from '../services/inviteService.js';
+
+import { acceptInvite,inviteMember } from '../services/inviteService.js';
 
 export async function createInviteHandler(req, res) {
   try {

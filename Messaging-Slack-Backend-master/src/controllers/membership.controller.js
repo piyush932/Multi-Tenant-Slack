@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
+
 import { changeRole } from '../services/membershipService.js';
 
 export async function changeRoleHandler(req, res) {
