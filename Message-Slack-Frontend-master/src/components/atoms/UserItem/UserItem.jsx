@@ -1,22 +1,26 @@
+import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
+import { cva } from 'class-variance-authority';
 import { Link } from 'react-router-dom';
+
+import { Avatar } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { useCurrentWorkspace } from '@/hooks/context/useCurrentWorkspace';
 
-// THE ROOT CAUSE OF THE "undefined" BUG:
-// context/WorkspaceContext.jsx provides:
-//     <WorkspaceContext.Provider value={{ currentWorkspace, setCurrentWorkspace }}>
-// i.e. the key is `currentWorkspace`, NOT `workspace`.
-//
-// This file previously did:
-//     const { workspace } = useCurrentWorkspace();   // <-- wrong key name
-// `workspace` was ALWAYS undefined because that key never existed on the
-// context value in the first place — it's a naming mismatch between the
-// provider and this consumer, not a timing/race issue. `workspace.id` (or
-// `._id`) then evaluated to `undefined`, which is exactly what showed up in
-// the broken URL: /workspace/undefined/members/...
-//
-// Fix: destructure the correct key (`currentWorkspace`), and build the URL
-// against the routes actually registered in Routes.jsx — plural
-// "/workspaces/", not singular "/workspace/".
+const userItemVariants = cva(
+  'flex items-center gap-1.5 justify-start font-normal h-7 px-4 text-sm overflow-hidden',
+  {
+    variants: {
+      variant: {
+        default: 'text-[#f9edffcc]',
+        active: 'text-[#481349] bg-white/90 hover:bg-white/90',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
 export const UserItem = ({
     id,
     label = 'Member',
@@ -24,26 +28,28 @@ export const UserItem = ({
     variant,
 }) => {
     const { currentWorkspace } = useCurrentWorkspace();
+    const avatarFallback = label.charAt(0).toUpperCase();
 
-    // Defensive guard: WorkspaceContext initializes as `useState(null)`, so
-    // there's a brief window on first render before it's populated. Render
-    // as a plain, non-navigating item rather than producing a broken link.
     if (!currentWorkspace?._id) {
-        return (
-            <div className="flex items-center gap-x-2 px-4 py-1 text-sm text-white/70">
-                {image && <img src={image} alt={label} className="w-6 h-6 rounded-md" />}
-                <span className="truncate">{label}</span>
-            </div>
-        );
+        return null;
     }
 
     return (
-        <Link
-            to={`/workspaces/${currentWorkspace._id}/members/${id}`}
-            className="flex items-center gap-x-2 px-4 py-1 rounded-md text-sm hover:bg-white/10 transition"
+        <Button
+            variant="transparent"
+            className={userItemVariants({ variant })}
+            size="sm"
+            asChild
         >
-            {image && <img src={image} alt={label} className="w-6 h-6 rounded-md" />}
-            <span className="truncate">{label}</span>
-        </Link>
+            <Link to={`/workspaces/${currentWorkspace._id}/members/${id}`}>
+                <Avatar className="size-5 rounded-md mr-1">
+                    <AvatarImage className="rounded-md" src={image} />
+                    <AvatarFallback className="rounded-md bg-sky-500 text-white text-xs">
+                        {avatarFallback}
+                    </AvatarFallback>
+                </Avatar>
+                <span className="text-sm truncate">{label}</span>
+            </Link>
+        </Button>
     );
 };
