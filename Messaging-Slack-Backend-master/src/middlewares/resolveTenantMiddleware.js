@@ -1,7 +1,5 @@
-import jwt from 'jsonwebtoken';
-
-import Membership from '../schema/membership.js';
 import Workspace from '../schema/workspace.js';
+import Membership from '../schema/membership.js';
 
 async function resolveTenantMiddleware(req, res, next) {
   try {
@@ -22,7 +20,7 @@ async function resolveTenantMiddleware(req, res, next) {
       ? await Workspace.findById(workspaceIdParam)
       : await Workspace.findOne({ slug: workspaceSlug });
 
-    if (!workspace) {
+    if (!workspace || workspace.deletedAt) {
       return res.status(404).json({ message: 'Not found' });
     }
 
@@ -32,6 +30,11 @@ async function resolveTenantMiddleware(req, res, next) {
     });
     if (!membership) {
       return res.status(404).json({ message: 'Not found' });
+    }
+    if (workspace.status === 'suspended') {
+      return res.status(402).json({
+        message: 'This workspace is suspended due to a billing issue. Contact your workspace owner.',
+      });
     }
 
     req.ctx = {

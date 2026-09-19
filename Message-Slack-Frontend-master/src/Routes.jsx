@@ -11,6 +11,7 @@ import { JoinPage } from './pages/Workspace/JoinPage';
 import { WorkspaceLayout } from './pages/Workspace/Layout';
 import { Payments } from './pages/Payments/Payments';
 import { RootRedirect } from './components/molecules/RootRedirect/RootRedirect';
+import { MemberProfile } from './pages/Workspace/MemberProfile/MemberProfile';
 
 export const AppRoutes = () => {
     return (
@@ -23,6 +24,9 @@ export const AppRoutes = () => {
           <Route
             path="/workspaces/:workspaceId/channels/:channelId"
             element={<ProtectedRoute><WorkspaceLayout><Channel /></WorkspaceLayout></ProtectedRoute>} />
+          <Route
+            path="/workspaces/:workspaceId/members/:memberId"
+            element={<ProtectedRoute><WorkspaceLayout><MemberProfile /></WorkspaceLayout></ProtectedRoute>} />
 
           <Route path="/makepayment" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
           <Route path="/workspaces/join/:workspaceId" element={<JoinPage />} />
