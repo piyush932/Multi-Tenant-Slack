@@ -1,8 +1,9 @@
 import {
-  countOwners,
   findMembership,
+  countOwners,
   updateRole,
 } from '../repositories/membershipRepository.js';
+import { recordAuditLog } from './auditLogService.js';
 
 export async function changeRole(workspaceId, membershipId, newRole, actingUserId) {
   const targetMembership = await findMembership(workspaceId, actingUserId);
@@ -23,9 +24,20 @@ export async function changeRole(workspaceId, membershipId, newRole, actingUserI
     }
   }
 
+  const previousRole = targetMembership.role;
   const updated = await updateRole(workspaceId, membershipId, newRole);
   if (!updated) {
     throw Object.assign(new Error('Not found'), { statusCode: 404 });
   }
+
+  await recordAuditLog({
+    workspaceId,
+    actorId: actingUserId,
+    action: 'membership.role_changed',
+    targetType: 'Membership',
+    targetId: membershipId,
+    metadata: { from: previousRole, to: newRole },
+  });
+
   return updated;
 }

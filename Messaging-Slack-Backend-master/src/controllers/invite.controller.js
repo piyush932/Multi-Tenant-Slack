@@ -1,11 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
-
-import { acceptInvite,inviteMember } from '../services/inviteService.js';
+import { inviteMember, acceptInvite } from '../services/inviteService.js';
 
 export async function createInviteHandler(req, res) {
   try {
     const { email, role } = req.body;
-    const invite = await inviteMember(req.ctx.workspaceId, email, role);
+    const invite = await inviteMember(req.ctx.workspaceId, email, role, req.ctx.userId);
     return res.status(StatusCodes.CREATED).json({
       success: true,
       data: {

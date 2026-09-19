@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-
+import Workspace from '../schema/workspace.js';
 import {
   createInvite,
   findValidInviteByToken,
@@ -7,10 +7,19 @@ import {
 } from '../repositories/inviteRepository.js';
 import { createOwnerMembership } from '../repositories/membershipRepository.js';
 import Membership from '../schema/membership.js';
-import Workspace from '../schema/workspace.js';
+import { recordAuditLog } from './auditLogService.js';
 
-export async function inviteMember(workspaceId, email, role) {
-  return createInvite(workspaceId, email, role);
+export async function inviteMember(workspaceId, email, role, actorId) {
+  const invite = await createInvite(workspaceId, email, role);
+  await recordAuditLog({
+    workspaceId,
+    actorId,
+    action: 'invite.created',
+    targetType: 'Invite',
+    targetId: invite._id,
+    metadata: { email, role },
+  });
+  return invite;
 }
 
 export async function acceptInvite(token, userId) {
@@ -39,6 +48,16 @@ export async function acceptInvite(token, userId) {
     );
 
     await session.commitTransaction();
+
+    await recordAuditLog({
+      workspaceId: invite.workspaceId,
+      actorId: userId,
+      action: 'invite.accepted',
+      targetType: 'Membership',
+      targetId: membership._id,
+      metadata: { role: invite.role },
+    });
+
     return membership;
   } catch (err) {
     await session.abortTransaction();
@@ -55,6 +74,16 @@ export async function createWorkspaceWithOwner(name, slug, ownerId) {
     const [workspace] = await Workspace.create([{ name, slug }], { session });
     await createOwnerMembership(workspace._id, ownerId, session);
     await session.commitTransaction();
+
+    await recordAuditLog({
+      workspaceId: workspace._id,
+      actorId: ownerId,
+      action: 'workspace.created',
+      targetType: 'Workspace',
+      targetId: workspace._id,
+      metadata: { name },
+    });
+
     return workspace;
   } catch (err) {
     await session.abortTransaction();
