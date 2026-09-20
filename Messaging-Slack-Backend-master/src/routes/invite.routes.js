@@ -1,11 +1,5 @@
 import express from 'express';
-
-import {
-  acceptInviteHandler,
-  createInviteHandler,
-} from '../controllers/invite.controller.js';
-import authMiddleware from '../middlewares/authMiddleware.js';
-import requirePermission from '../middlewares/permissionMiddleware.js';
+import { isAuthenticated } from '../middlewares/authMiddleware.js';
 import resolveTenantMiddleware from '../middlewares/resolveTenantMiddleware.js';
 import tenantRateLimit from '../middlewares/tenantRateLimitMiddleware.js';
 
@@ -13,13 +7,13 @@ const router = express.Router();
 
 router.post(
   '/workspaces/:workspaceId/invites',
-  authMiddleware,
+  isAuthenticated,
   resolveTenantMiddleware,
   requirePermission('membership:invite'),
   tenantRateLimit({ windowSeconds: 60, maxRequests: 20 }),
   createInviteHandler
 );
 
-router.post('/invites/:token/accept', authMiddleware, acceptInviteHandler);
+router.post('/invites/:token/accept', isAuthenticated, acceptInviteHandler);
 
 export default router;

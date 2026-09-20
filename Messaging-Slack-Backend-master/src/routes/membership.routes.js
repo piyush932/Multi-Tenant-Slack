@@ -1,15 +1,14 @@
 import express from 'express';
-
-import { changeRoleHandler } from '../controllers/membership.controller.js';
-import authMiddleware from '../middlewares/authMiddleware.js';
-import requirePermission from '../middlewares/permissionMiddleware.js';
+import { isAuthenticated } from '../middlewares/authMiddleware.js';
 import resolveTenantMiddleware from '../middlewares/resolveTenantMiddleware.js';
+import requirePermission from '../middlewares/permissionMiddleware.js';
+import { changeRoleHandler } from '../controllers/membership.controller.js';
 
 const router = express.Router();
 
 router.patch(
   '/memberships/:id',
-  authMiddleware,
+  isAuthenticated,
   resolveTenantMiddleware,
   requirePermission('membership:changeRole'),
   changeRoleHandler
