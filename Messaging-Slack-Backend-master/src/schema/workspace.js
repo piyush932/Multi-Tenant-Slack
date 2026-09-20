@@ -31,7 +31,21 @@ const workspaceSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Channel'
     }
-  ]
+  ],
+  plan: {
+    type: String,
+    enum: ['free', 'pro'],
+    default: 'free'
+  },
+  status: {
+    type: String,
+    enum: ['active', 'suspended'],
+    default: 'active'
+  },
+  deletedAt: {
+    type: Date,
+    default: null
+  }
 });
 
 const Workspace = mongoose.model('Workspace', workspaceSchema);

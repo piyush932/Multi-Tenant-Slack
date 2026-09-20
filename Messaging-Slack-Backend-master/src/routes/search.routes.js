@@ -1,7 +1,8 @@
 import express from 'express';
+
+import { searchHandler } from '../controllers/search.controller.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import resolveTenantMiddleware from '../middlewares/resolveTenantMiddleware.js';
-import { searchHandler } from '../controllers/search.controller.js';
 
 const router = express.Router();
 
