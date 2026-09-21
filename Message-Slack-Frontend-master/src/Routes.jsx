@@ -9,6 +9,7 @@ import { Notfound } from '@/pages/Notfound/Notfound';
 import { Channel } from './pages/Workspace/Channel/Channel';
 import { JoinPage } from './pages/Workspace/JoinPage';
 import { WorkspaceLayout } from './pages/Workspace/Layout';
+import { WorkspaceHome } from './pages/Workspace/WorkspaceHome/WorkspaceHome';
 import { Payments } from './pages/Payments/Payments';
 import { RootRedirect } from './components/molecules/RootRedirect/RootRedirect';
 import { MemberProfile } from './pages/Workspace/MemberProfile/MemberProfile';
@@ -20,7 +21,9 @@ export const AppRoutes = () => {
           <Route path="/auth/signup" element={<Auth><SignupContainer /></Auth>} />
           <Route path="/auth/signin" element={<Auth><SigninContainer /></Auth>} />
           <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/workspaces/:workspaceId" element={<ProtectedRoute><WorkspaceLayout>Workspace</WorkspaceLayout></ProtectedRoute>} />
+          <Route
+            path="/workspaces/:workspaceId"
+            element={<ProtectedRoute><WorkspaceLayout><WorkspaceHome /></WorkspaceLayout></ProtectedRoute>} />
           <Route
             path="/workspaces/:workspaceId/channels/:channelId"
             element={<ProtectedRoute><WorkspaceLayout><Channel /></WorkspaceLayout></ProtectedRoute>} />
