@@ -10,6 +10,7 @@ import { Channel } from './pages/Workspace/Channel/Channel';
 import { JoinPage } from './pages/Workspace/JoinPage';
 import { WorkspaceLayout } from './pages/Workspace/Layout';
 import { WorkspaceHome } from './pages/Workspace/WorkspaceHome/WorkspaceHome';
+import { WorkspaceSpecialPage } from './pages/Workspace/WorkspaceSpecialPage/WorkspaceSpecialPage';
 import { Payments } from './pages/Payments/Payments';
 import { RootRedirect } from './components/molecules/RootRedirect/RootRedirect';
 import { MemberProfile } from './pages/Workspace/MemberProfile/MemberProfile';
@@ -21,16 +22,11 @@ export const AppRoutes = () => {
           <Route path="/auth/signup" element={<Auth><SignupContainer /></Auth>} />
           <Route path="/auth/signin" element={<Auth><SigninContainer /></Auth>} />
           <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route
-            path="/workspaces/:workspaceId"
-            element={<ProtectedRoute><WorkspaceLayout><WorkspaceHome /></WorkspaceLayout></ProtectedRoute>} />
-          <Route
-            path="/workspaces/:workspaceId/channels/:channelId"
-            element={<ProtectedRoute><WorkspaceLayout><Channel /></WorkspaceLayout></ProtectedRoute>} />
-          <Route
-            path="/workspaces/:workspaceId/members/:memberId"
-            element={<ProtectedRoute><WorkspaceLayout><MemberProfile /></WorkspaceLayout></ProtectedRoute>} />
-
+          <Route path="/workspaces/:workspaceId" element={<ProtectedRoute><WorkspaceLayout><WorkspaceHome /></WorkspaceLayout></ProtectedRoute>} />
+          <Route path="/workspaces/:workspaceId/channels/:channelId" element={<ProtectedRoute><WorkspaceLayout><Channel /></WorkspaceLayout></ProtectedRoute>} />
+          <Route path="/workspaces/:workspaceId/threads" element={<ProtectedRoute><WorkspaceLayout><WorkspaceSpecialPage type="threads" /></WorkspaceLayout></ProtectedRoute>} />
+          <Route path="/workspaces/:workspaceId/drafts" element={<ProtectedRoute><WorkspaceLayout><WorkspaceSpecialPage type="drafts" /></WorkspaceLayout></ProtectedRoute>} />
+          <Route path="/workspaces/:workspaceId/members/:memberId" element={<ProtectedRoute><WorkspaceLayout><MemberProfile /></WorkspaceLayout></ProtectedRoute>} />
           <Route path="/makepayment" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
           <Route path="/workspaces/join/:workspaceId" element={<JoinPage />} />
           <Route path="/*" element={<Notfound />} />
